@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { FaChevronDown, FaChevronUp, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
@@ -10,6 +10,9 @@ import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
 function TentangContent() {
   const { lang } = useLanguage();
   const [openAccordion, setOpenAccordion] = useState<string | null>("visi");
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const toggleAccordion = (section: string) => {
     setOpenAccordion(openAccordion === section ? null : section);
@@ -29,7 +32,7 @@ function TentangContent() {
         visiText: "Menumbuhkan kepercayaan dan kredibilitas pelanggan dengan memberikan solusi teknologi informasi yang kreatif dan terbaik.",
         misiText: "PT Firmusindo Infotama dibentuk untuk menjadi salah satu perusahaan handal, profesional dan berperan dalam pengembangan teknologi secara tepat guna serta bermanfaat untuk pusat-pusat bisnis dan kegiatan yang ada di Indonesia."
       },
-      layanan: "Layanan Kami", // <-- SAYA TAMBAHKAN INI
+      layanan: "Layanan Kami",
       galleryTitle: "Galeri Proyek",
     },
     en: {
@@ -45,7 +48,7 @@ function TentangContent() {
         visiText: "To grow customer trust and credibility by providing creative and best information technology solutions.",
         misiText: "PT Firmusindo Infotama was formed to become a reliable, professional company and play a role in the development of appropriate technology and beneficial for business centers and activities in Indonesia."
       },
-      layanan: "Our Services", // <-- SAYA TAMBAHKAN INI
+      layanan: "Our Services",
       galleryTitle: "Project Gallery",
     }
   };
@@ -60,8 +63,6 @@ function TentangContent() {
     { src: "/project/layanan5.jpg", alt: "Layanan 5" },
   ];
 
-  const [currentSlide, setCurrentSlide] = useState(0);
-
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev === serviceImages.length - 1 ? 0 : prev + 1));
   };
@@ -69,6 +70,20 @@ function TentangContent() {
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev === 0 ? serviceImages.length - 1 : prev - 1));
   };
+
+  // Fungsi Auto-Slide tiap 4 detik
+  useEffect(() => {
+    if (!isHovered) {
+      intervalRef.current = setInterval(nextSlide, 4000);
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isHovered]);
 
   const projectImages = Array.from({ length: 16 }, (_, i) => ({
     src: `/project/${i + 1}.jpg`,
@@ -163,16 +178,20 @@ function TentangContent() {
         </div>
       </section>
 
-      {/* LAYANAN KAMI (SLIDER) */}
+      {/* LAYANAN KAMI (SLIDER - AUTO SLIDE 4 DETIK) */}
       <section className="py-12 px-4 bg-gray-50">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              {t.layanan} {/* <-- SEKARANG PAKAI t.layanan */}
+              {t.layanan}
             </h2>
           </div>
 
-          <div className="relative bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-gray-100 overflow-hidden group mx-auto">
+          <div
+            className="relative bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-gray-100 overflow-hidden group mx-auto"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
             <div className="relative h-[260px] md:h-[340px] w-full overflow-hidden rounded-xl border border-gray-200 hover:border-blue-600 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-lg cursor-pointer">
               {serviceImages.map((img, index) => (
                 <div
