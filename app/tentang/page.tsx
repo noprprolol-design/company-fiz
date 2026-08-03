@@ -50,6 +50,7 @@ function TentangContent() {
 
   const t = translations[lang] || translations.id;
 
+  // Layanan: 5 foto (layanan1.jpg - layanan5.jpg)
   const serviceImages = [
     { src: "/project/layanan1.jpg", alt: "Layanan 1" },
     { src: "/project/layanan2.jpg", alt: "Layanan 2" },
@@ -68,8 +69,9 @@ function TentangContent() {
     setCurrentSlide((prev) => (prev === 0 ? serviceImages.length - 1 : prev - 1));
   };
 
-  const projectImages = Array.from({ length: 15 }, (_, i) => ({
-    src: `/project/galeri/${i + 1}.jpg`,
+  // Galeri Proyek: 16 foto (1.jpg - 16.jpg)
+  const projectImages = Array.from({ length: 16 }, (_, i) => ({
+    src: `/project/${i + 1}.jpg`,
     alt: `Proyek ${i + 1}`,
   }));
 
@@ -161,7 +163,7 @@ function TentangContent() {
         </div>
       </section>
 
-      {/* LAYANAN KAMI (SLIDER - DIPERBESAR LAGI) */}
+      {/* LAYANAN KAMI (SLIDER) */}
       <section className="py-12 px-4 bg-gray-50">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-6">
@@ -171,7 +173,6 @@ function TentangContent() {
           </div>
 
           <div className="relative bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-gray-100 overflow-hidden group mx-auto">
-            {/* Tinggi slider diperbesar lagi */}
             <div className="relative h-[260px] md:h-[340px] w-full overflow-hidden rounded-xl border border-gray-200 hover:border-blue-600 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-lg cursor-pointer">
               {serviceImages.map((img, index) => (
                 <div
@@ -223,7 +224,7 @@ function TentangContent() {
         </div>
       </section>
 
-      {/* GALERI PROYEK (15 FOTO) */}
+      {/* GALERI PROYEK (16 FOTO) */}
       <section className="py-12 px-4 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
