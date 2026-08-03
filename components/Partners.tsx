@@ -45,7 +45,7 @@ const partners = [
     logo: "/company/cisco.jpg" 
   },
   { 
-    name: "mirax", 
+    name: "Nirax", 
     sub: "1st RACK ENCLOSURES",
     logo: "/company/mirax.jpg" 
   },
@@ -75,7 +75,7 @@ const partners = [
     logo: "/company/zyrex.jpg" 
   },
   { 
-    name: "DELL", 
+    name: "DOLL", 
     sub: "",
     logo: "/company/dell.jpg" 
   },

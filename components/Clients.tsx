@@ -29,7 +29,7 @@ const clients: Client[] = [
   { name: "PPN", logo: "/klien/ppn.jpg" },
   { name: "Premier Oil", logo: "/klien/premieroil.jpg" },
   { name: "Pusat Jantung Nasional", logo: "/klien/pusatjantung.jpg" },
-  { name: "Telkom", logo: "/klien/telkom.jpg" },
+  { name: "Telkom Akses", logo: "/klien/telkom.jpg" },
   { name: "Telkomsel", logo: "/klien/telkomsel.jpg" },
   { name: "VICO Indonesia", logo: "/klien/vico.jpg" },
   { name: "Harapan Kita", logo: "/klien/harapankita.jpg" },

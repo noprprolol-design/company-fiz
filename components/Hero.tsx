@@ -20,7 +20,7 @@ export default function Hero() {
   const t = content[lang];
 
   return (
-    <section className="min-h-screen flex items-center relative text-white pt-20 pb-12 overflow-hidden">
+    <section id="home" className="min-h-screen flex items-center relative text-white pt-20 pb-12 overflow-hidden">
       
       {/* VIDEO BACKGROUND */}
       <video
