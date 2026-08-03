@@ -29,6 +29,7 @@ function TentangContent() {
         visiText: "Menumbuhkan kepercayaan dan kredibilitas pelanggan dengan memberikan solusi teknologi informasi yang kreatif dan terbaik.",
         misiText: "PT Firmusindo Infotama dibentuk untuk menjadi salah satu perusahaan handal, profesional dan berperan dalam pengembangan teknologi secara tepat guna serta bermanfaat untuk pusat-pusat bisnis dan kegiatan yang ada di Indonesia."
       },
+      layanan: "Layanan Kami", // <-- SAYA TAMBAHKAN INI
       galleryTitle: "Galeri Proyek",
     },
     en: {
@@ -44,13 +45,13 @@ function TentangContent() {
         visiText: "To grow customer trust and credibility by providing creative and best information technology solutions.",
         misiText: "PT Firmusindo Infotama was formed to become a reliable, professional company and play a role in the development of appropriate technology and beneficial for business centers and activities in Indonesia."
       },
+      layanan: "Our Services", // <-- SAYA TAMBAHKAN INI
       galleryTitle: "Project Gallery",
     }
   };
 
   const t = translations[lang] || translations.id;
 
-  // Layanan: 5 foto (layanan1.jpg - layanan5.jpg)
   const serviceImages = [
     { src: "/project/layanan1.jpg", alt: "Layanan 1" },
     { src: "/project/layanan2.jpg", alt: "Layanan 2" },
@@ -69,7 +70,6 @@ function TentangContent() {
     setCurrentSlide((prev) => (prev === 0 ? serviceImages.length - 1 : prev - 1));
   };
 
-  // Galeri Proyek: 16 foto (1.jpg - 16.jpg)
   const projectImages = Array.from({ length: 16 }, (_, i) => ({
     src: `/project/${i + 1}.jpg`,
     alt: `Proyek ${i + 1}`,
@@ -168,7 +168,7 @@ function TentangContent() {
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              {t.accordion.layanan}
+              {t.layanan} {/* <-- SEKARANG PAKAI t.layanan */}
             </h2>
           </div>
 
