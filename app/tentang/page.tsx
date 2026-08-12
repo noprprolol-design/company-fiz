@@ -86,7 +86,7 @@ function TentangContent() {
   }, [isHovered]);
 
   const projectImages = Array.from({ length: 16 }, (_, i) => ({
-    src: `/project/${i + 1}.jpg`,
+    src: `/m/${i + 1}.jpg`,
     alt: `Proyek ${i + 1}`,
   }));
 
@@ -285,3 +285,4 @@ export default function TentangPage() {
     </LanguageProvider>
   );
 }
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaUser, FaWhatsapp, FaCalendarAlt, FaGlobe } from "react-icons/fa";
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaUser, FaWhatsapp, FaCalendarAlt } from "react-icons/fa";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
@@ -21,13 +21,62 @@ function KontakContent() {
     message: "",
     additionalMessage: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | null; text: string }>({
+    type: null,
+    text: '',
+  });
 
-  // NOMOR WHATSAPP ANDA
-  const whatsappNumber = "6287826907056";
+  const whatsappNumber = "6281316053333";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Hilangkan status message saat user mulai mengetik
+    if (statusMessage.type) {
+      setStatusMessage({ type: null, text: '' });
+    }
+  };
+
+  // ============= HANDLE SUBMIT =============
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setStatusMessage({ type: null, text: '' });
+
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStatusMessage({ type: 'success', text: '✅ Pesan berhasil dikirim! Kami akan segera merespons.' });
+        // Reset form
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          subject: '',
+          service: '',
+          projectType: '',
+          budget: '',
+          timeline: '',
+          date: '',
+          message: '',
+          additionalMessage: '',
+        });
+      } else {
+        setStatusMessage({ type: 'error', text: result.message || '❌ Gagal mengirim pesan. Silakan coba lagi.' });
+      }
+    } catch (error) {
+      setStatusMessage({ type: 'error', text: '❌ Terjadi kesalahan. Silakan coba lagi.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const translations = {
@@ -40,10 +89,9 @@ function KontakContent() {
       address3: "Tanah Abang 10250, Jakarta, Indonesia",
       phone: "+62-21 2274-1521",
       email: "info@firmusindo.co.id",
-      website: "firmusindo.co.id",
       openMaps: "📍 Buka di Google Maps",
-      formTitle: "Request Project",
-      formSubtitle: "Isi formulir di bawah ini, dan saya akan merespons via WhatsApp",
+      formTitle: "Konsultasi",
+      formSubtitle: "Isi formulir di bawah ini, dan kami akan merespons via email atau WhatsApp",
       fullName: "Full Name",
       fullNamePlaceholder: "Masukkan nama lengkap Anda",
       emailLabel: "Active Email",
@@ -84,13 +132,14 @@ function KontakContent() {
       },
       subject: "Subjek",
       subjectPlaceholder: "Judul pesan Anda",
-      date: "dd/mm/yyyy --:--",
+      date: "Tanggal",
       message: "Deskripsi Proyek (fitur, tujuan, dll.)",
       messagePlaceholder: "Jelaskan proyek Anda secara detail...",
       additionalMessage: "Pesan tambahan atau pertanyaan",
       additionalPlaceholder: "Tulis pesan tambahan...",
       required: "*",
       send: "Kirim Pesan",
+      sending: "Mengirim...",
       or: "atau",
       whatsapp: "Kirim Permintaan melalui WhatsApp",
       selectOption: "Pilih...",
@@ -107,10 +156,9 @@ function KontakContent() {
       address3: "Tanah Abang 10250, Jakarta, Indonesia",
       phone: "+62-21 2274-1521",
       email: "info@firmusindo.co.id",
-      website: "firmusindo.co.id",
       openMaps: "📍 Open in Google Maps",
-      formTitle: "Request Project",
-      formSubtitle: "Fill out the form below, and I will respond via WhatsApp",
+      formTitle: "Consultation",
+      formSubtitle: "Fill out the form below, and we will respond via email or WhatsApp",
       fullName: "Full Name",
       fullNamePlaceholder: "Enter your full name",
       emailLabel: "Active Email",
@@ -151,13 +199,14 @@ function KontakContent() {
       },
       subject: "Subject",
       subjectPlaceholder: "Your message subject",
-      date: "dd/mm/yyyy --:--",
+      date: "Date",
       message: "Project Description (features, goals, etc.)",
       messagePlaceholder: "Describe your project in detail...",
       additionalMessage: "Additional message or questions",
       additionalPlaceholder: "Write additional message...",
       required: "*",
       send: "Send Message",
+      sending: "Sending...",
       or: "or",
       whatsapp: "Send Request via WhatsApp",
       selectOption: "Select...",
@@ -169,9 +218,7 @@ function KontakContent() {
 
   const t = translations[lang] || translations.id;
 
-  // Buat pesan WhatsApp dengan data form
   const getWhatsAppMessage = () => {
-    // Map value ke label yang sesuai dengan bahasa
     const serviceLabels: Record<string, string> = {
       infrastructure: t.serviceOptions.infrastructure,
       support: t.serviceOptions.support,
@@ -237,9 +284,7 @@ function KontakContent() {
           <source src="/video/firmus.mp4" type="video/mp4" />
           <div className="absolute inset-0 bg-blue-900/80 z-0" />
         </video>
-
         <div className="absolute inset-0 bg-black/50 z-1"></div>
-
         <div className="relative z-10 text-center px-4">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg tracking-tight">
             {t.title}
@@ -254,14 +299,10 @@ function KontakContent() {
       <section className="py-16 px-4 md:py-20 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            
             {/* KOLOM KIRI: Info Kontak */}
             <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
               <h2 className="text-xl font-bold text-gray-900 mb-5">{t.office}</h2>
-              
               <div className="space-y-4">
-                
-                {/* ALAMAT */}
                 <div className="flex items-start gap-3">
                   <FaMapMarkerAlt className="text-blue-600 text-lg mt-1 flex-shrink-0" />
                   <div>
@@ -271,7 +312,7 @@ function KontakContent() {
                       {t.address3}
                     </p>
                     <a
-                      href="https://www.google.com/maps/place/The+Boulevard+Office/@-6.1882955,106.8171483,17z/data=!4m6!3m5!1s0x2e69f5305e7c6f1b:0x1a0b2b3c4d5e6f7a!8m2!3d-6.1882955!4d106.8171483!16s%2Fg%2F11c2f5g7h1"
+                      href="https://www.google.com/maps/place/The+Boulevard+Office/@-6.1894667,106.816046,17z"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 text-xs hover:underline mt-1 inline-block"
@@ -280,8 +321,6 @@ function KontakContent() {
                     </a>
                   </div>
                 </div>
-                
-                {/* TELEPON */}
                 <div className="flex items-center gap-3">
                   <FaPhone className="text-blue-600 text-lg flex-shrink-0" />
                   <div>
@@ -290,8 +329,6 @@ function KontakContent() {
                     </a>
                   </div>
                 </div>
-                
-                {/* EMAIL */}
                 <div className="flex items-center gap-3">
                   <FaEnvelope className="text-blue-600 text-lg flex-shrink-0" />
                   <div>
@@ -300,20 +337,7 @@ function KontakContent() {
                     </a>
                   </div>
                 </div>
-
-                {/* WEBSITE */}
-                <div className="flex items-center gap-3">
-                  <FaGlobe className="text-blue-600 text-lg flex-shrink-0" />
-                  <div>
-                    <a href="https://firmusindo.co.id" target="_blank" rel="noopener noreferrer" className="text-gray-700 text-sm hover:text-blue-600 transition-colors font-medium">
-                      {t.website}
-                    </a>
-                  </div>
-                </div>
-
               </div>
-
-              {/* JAM OPERASIONAL */}
               <div className="mt-6 pt-4 border-t border-gray-200">
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                   {t.businessHours}
@@ -328,13 +352,13 @@ function KontakContent() {
             {/* KOLOM KANAN: Google Maps */}
             <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg border border-gray-100 h-[350px] relative group">
               <a
-                href="https://www.google.com/maps/place/The+Boulevard+Office/@-6.1882955,106.8171483,17z/data=!4m6!3m5!1s0x2e69f5305e7c6f1b:0x1a0b2b3c4d5e6f7a!8m2!3d-6.1882955!4d106.8171483!16s%2Fg%2F11c2f5g7h1"
+                href="https://www.google.com/maps/place/The+Boulevard+Office/@-6.1894227,106.8156004,17z"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full h-full"
               >
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.322116435304!2d106.8930059!3d-6.2225841!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f4b68c6384d9%3A0x3b523bc5aa8b0d7b!2sJl.%20H.%20Jaelani%20No.39B%2C%20Pd.%20Bambu%2C%20Kec.%20Duren%20Sawit%2C%20Kota%20Jakarta%20Timur%2C%20Daerah%20Khusus%20Ibukota%20Jakarta%2013430!5e0!3m2!1sid!2sid!4v1723456789012!5m2!1sid!2sid"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.616315731497!2d106.81560038569218!3d-6.189422726955475!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f42d5cb3d5e7%3A0x8eaffb9cd7db05e4!2sThe%20Boulevard!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
@@ -343,18 +367,16 @@ function KontakContent() {
                   referrerPolicy="no-referrer-when-downgrade"
                 />
               </a>
-
               <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-md text-[10px] font-semibold text-gray-700 border border-gray-200 pointer-events-none group-hover:bg-white transition-colors">
                 {t.openMaps}
               </div>
             </div>
-            
           </div>
         </div>
       </section>
 
-      {/* SECTION FORM - DENGAN PILIHAN & TANGGAL */}
-      <section className="py-12 px-4 md:py-16 bg-gray-50">
+      {/* SECTION FORM */}
+      <section id="form-section" className="py-12 px-4 md:py-16 bg-gray-50">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
@@ -366,9 +388,14 @@ function KontakContent() {
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-gray-100">
-            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-              
-              {/* NAMA LENGKAP & EMAIL - 2 KOLOM */}
+            {/* STATUS MESSAGE */}
+            {statusMessage.type && (
+              <div className={`mb-4 p-3 rounded-lg text-sm ${statusMessage.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                {statusMessage.text}
+              </div>
+            )}
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-700 font-semibold text-sm mb-1.5">
@@ -387,7 +414,6 @@ function KontakContent() {
                     />
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-gray-700 font-semibold text-sm mb-1.5">
                     {t.emailLabel} <span className="text-red-500">{t.required}</span>
@@ -407,7 +433,6 @@ function KontakContent() {
                 </div>
               </div>
 
-              {/* TELEPON */}
               <div>
                 <label className="block text-gray-700 font-semibold text-sm mb-1.5">
                   {t.phoneNumber}
@@ -425,7 +450,6 @@ function KontakContent() {
                 </div>
               </div>
 
-              {/* LAYANAN & TIPE PROYEK - 2 KOLOM */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-700 font-semibold text-sm mb-1.5">
@@ -447,7 +471,6 @@ function KontakContent() {
                     <option value="other">{t.serviceOptions.other}</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-gray-700 font-semibold text-sm mb-1.5">
                     {t.projectType}
@@ -467,7 +490,6 @@ function KontakContent() {
                 </div>
               </div>
 
-              {/* BUDGET & TIMELINE - 2 KOLOM */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-700 font-semibold text-sm mb-1.5">
@@ -487,7 +509,6 @@ function KontakContent() {
                     <option value="discuss">{t.budgetOptions.discuss}</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-gray-700 font-semibold text-sm mb-1.5">
                     {t.timeline}
@@ -507,7 +528,6 @@ function KontakContent() {
                 </div>
               </div>
 
-              {/* SUBJEK */}
               <div>
                 <label className="block text-gray-700 font-semibold text-sm mb-1.5">
                   {t.subject}
@@ -522,7 +542,6 @@ function KontakContent() {
                 />
               </div>
 
-              {/* DESKRIPSI PROYEK */}
               <div>
                 <label className="block text-gray-700 font-semibold text-sm mb-1.5">
                   {t.message} <span className="text-red-500">{t.required}</span>
@@ -538,7 +557,6 @@ function KontakContent() {
                 />
               </div>
 
-              {/* TANGGAL */}
               <div>
                 <label className="block text-gray-700 font-semibold text-sm mb-1.5">
                   {t.date}
@@ -555,7 +573,6 @@ function KontakContent() {
                 </div>
               </div>
 
-              {/* PESAN TAMBAHAN */}
               <div>
                 <label className="block text-gray-700 font-semibold text-sm mb-1.5">
                   {t.additionalMessage}
@@ -570,16 +587,15 @@ function KontakContent() {
                 />
               </div>
 
-              {/* TOMBOL KIRIM */}
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm"
+                disabled={isLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm"
               >
                 <FaEnvelope className="text-sm" />
-                {t.send}
+                {isLoading ? t.sending : t.send}
               </button>
 
-              {/* ATAU HUBUNGI VIA WHATSAPP */}
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>

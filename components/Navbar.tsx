@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import Link from "next/link";
+import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function Navbar() {
@@ -30,11 +31,9 @@ export default function Navbar() {
 
   const currentMenu = lang === "id" ? menuItems.id : menuItems.en;
 
-  // Fungsi untuk memaksa scroll ke atas (diubah ke instan)
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      // behavior: "smooth", // <- Dihapus agar langsung instan
     });
   };
 
@@ -42,19 +41,28 @@ export default function Navbar() {
     <nav className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* LOGO - SCROLL KE ATAS */}
-          <div className="flex-shrink-0 cursor-pointer" onClick={scrollToTop}>
-            <Link href="/" scroll={false}>
-              <h1 className="text-xl md:text-2xl font-bold text-blue-900 tracking-tight">
-                FIRMUSINDO
-                <span className="text-blue-600"> INFOTAMA</span>
+          
+          {/* LOGO - GAMBAR & TEKS (BULATAN & BORDER SUDAH DIHAPUS) */}
+          <div className="flex-shrink-0 cursor-pointer flex items-center gap-3" onClick={scrollToTop}>
+            <Link href="/" scroll={false} className="flex items-center gap-3">
+              
+              <Image 
+                src="/m/firmus1.png" 
+                alt="Logo Firmusindo" 
+                width={40} 
+                height={40} 
+                className="w-10 h-10 object-contain" 
+              />
+              
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight">
+                <span className="text-green-600">FIRMUSINDO</span>
+                <span className="text-yellow-500"> INFOTAMA</span>
               </h1>
             </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
             {currentMenu.map((item) => {
-              // Jika item adalah Beranda/Home
               if (item.name === "Beranda" || item.name === "Home") {
                 return (
                   <Link
@@ -68,7 +76,6 @@ export default function Navbar() {
                   </Link>
                 );
               }
-              // Untuk item lainnya
               return (
                 <Link
                   key={item.name}

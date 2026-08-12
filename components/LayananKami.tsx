@@ -9,9 +9,26 @@ import {
   FaHome 
 } from "react-icons/fa";
 import { useLanguage } from "@/context/LanguageContext";
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
 export default function LayananKami() {
   const { lang } = useLanguage();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sectionRef = useRef(null);
+  const [offset, setOffset] = useState(0);
+
+  // Data 8 foto untuk background
+  const backgroundImages = [
+    { id: 1, src: "/m/1.jpg", alt: "Background 1" },
+    { id: 2, src: "/m/2.jpg", alt: "Background 2" },
+    { id: 3, src: "/m/3.jpg", alt: "Background 3" },
+    { id: 4, src: "/m/4.jpg", alt: "Background 4" },
+    { id: 5, src: "/m/5.jpg", alt: "Background 5" },
+    { id: 6, src: "/m/6.jpg", alt: "Background 6" },
+    { id: 7, src: "/m/7.jpg", alt: "Background 7" },
+    { id: 8, src: "/m/8.jpg", alt: "Background 8" },
+  ];
 
   const content = {
     id: {
@@ -65,38 +82,101 @@ export default function LayananKami() {
     },
   ];
 
+  // Auto-slide effect - berjalan otomatis tanpa interaksi user
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % backgroundImages.length);
+    }, 4000); // Ganti setiap 4 detik
+
+    return () => clearInterval(interval);
+  }, [backgroundImages.length]);
+
+  // Parallax effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const visibleRatio = Math.max(0, Math.min(1, 
+          (viewportHeight - rect.top) / (viewportHeight + rect.height)
+        ));
+        const parallaxOffset = visibleRatio * 30;
+        setOffset(parallaxOffset);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section id="services" className="py-16 px-4 md:py-24 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section 
+      ref={sectionRef}
+      id="services" 
+      className="relative w-full min-h-screen overflow-hidden"
+    >
+      {/* Background Slider - Tanpa navigasi apapun */}
+      <div className="absolute inset-0 z-0 w-full h-full">
+        {backgroundImages.map((img, index) => (
+          <div
+            key={img.id}
+            className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <div className="relative w-full h-full">
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                sizes="100vw"
+                quality={90}
+                priority={index === 0}
+                className="object-cover object-center"
+                style={{
+                  transform: `scale(${1 + offset * 0.001})`,
+                  transition: 'transform 0.3s ease-out'
+                }}
+              />
+            </div>
+          </div>
+        ))}
         
-        <div className="flex flex-col items-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-4">
+        {/* Overlay dengan gradasi */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60 z-10"></div>
+      </div>
+
+      {/* Konten */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 md:py-24 min-h-screen flex flex-col justify-center">
+        <div className="flex flex-col items-center mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-white mb-4 tracking-tight">
             {t.title}
           </h2>
-          {/* GARIS BIRU DI BAWAH INI SUDAH SAYA HAPUS */}
+          <div className="w-20 h-1 bg-blue-500 rounded-full"></div>
         </div>
 
-        <p className="text-center text-gray-600 text-sm md:text-base mb-12 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-center text-gray-200 text-base md:text-lg mb-12 max-w-3xl mx-auto leading-relaxed">
           {t.subtitle}
         </p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
           {services.map((item, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg p-4 md:p-6 border border-gray-200 hover:border-blue-600 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-lg flex flex-col items-center justify-center min-h-[140px] md:min-h-[160px] cursor-pointer"
+              className="bg-white/90 backdrop-blur-md rounded-xl p-5 md:p-6 lg:p-8 border border-white/20 hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl flex flex-col items-center justify-center min-h-[160px] md:min-h-[180px] lg:min-h-[200px] cursor-pointer group"
             >
-              <div className="flex items-center justify-center w-full h-[60px] md:h-[70px] mb-2">
-                <div className="text-5xl text-gray-900">
+              <div className="flex items-center justify-center w-full h-[70px] md:h-[80px] lg:h-[90px] mb-3">
+                <div className="text-5xl md:text-6xl text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
                   {item.icon}
                 </div>
               </div>
               
-              <p className="font-bold text-gray-800 text-xs md:text-sm text-center leading-tight">
+              <p className="font-bold text-gray-800 text-xs md:text-sm lg:text-base text-center leading-tight">
                 {item.title}
               </p>
               
-              <p className="text-[11px] md:text-sm text-gray-500 mt-1 text-center leading-relaxed">
+              <p className="text-[10px] md:text-xs lg:text-sm text-gray-600 mt-2 text-center leading-relaxed">
                 {lang === "id" ? item.id_desc : item.en_desc}
               </p>
             </div>
