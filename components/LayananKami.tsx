@@ -15,10 +15,9 @@ import Image from "next/image";
 export default function LayananKami() {
   const { lang } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLDivElement>(null); // ✅ FIX
   const [offset, setOffset] = useState(0);
 
-  // Data 8 foto untuk background
   const backgroundImages = [
     { id: 1, src: "/m/1.jpg", alt: "Background 1" },
     { id: 2, src: "/m/2.jpg", alt: "Background 2" },
@@ -82,16 +81,15 @@ export default function LayananKami() {
     },
   ];
 
-  // Auto-slide effect - berjalan otomatis tanpa interaksi user
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % backgroundImages.length);
-    }, 4000); // Ganti setiap 4 detik
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [backgroundImages.length]);
 
-  // Parallax effect
+  // ✅ FIX: Tambahin optional chaining
   useEffect(() => {
     const handleScroll = () => {
       if (sectionRef.current) {
@@ -116,7 +114,6 @@ export default function LayananKami() {
       id="services" 
       className="relative w-full min-h-screen overflow-hidden"
     >
-      {/* Background Slider - Tanpa navigasi apapun */}
       <div className="absolute inset-0 z-0 w-full h-full">
         {backgroundImages.map((img, index) => (
           <div
@@ -143,11 +140,9 @@ export default function LayananKami() {
           </div>
         ))}
         
-        {/* Overlay dengan gradasi */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60 z-10"></div>
       </div>
 
-      {/* Konten */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 md:py-24 min-h-screen flex flex-col justify-center">
         <div className="flex flex-col items-center mb-8 md:mb-12">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-white mb-4 tracking-tight">
