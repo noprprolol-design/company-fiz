@@ -51,7 +51,10 @@ export default function Footer() {
           
           {/* KOLOM 1 */}
           <div className="flex-1 flex flex-col items-start text-left">
-            <h3 className="text-lg font-bold text-white mb-3">{t.company}</h3>
+            <h3 className="text-lg font-bold text-white mb-3">
+              <span className="text-white">Firmusindo</span>
+              <span className="text-white"> Infotama</span>
+            </h3>
             <p className="text-white text-sm leading-relaxed">
               {t.tagline}
             </p>

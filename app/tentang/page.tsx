@@ -1,18 +1,29 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { FaChevronDown, FaChevronUp, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useState, useEffect, useRef } from "react";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 function TentangContent() {
   const { lang } = useLanguage();
   const [openAccordion, setOpenAccordion] = useState<string | null>("visi");
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [headerSlide, setHeaderSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const backgroundImages = [
+    { id: 1, src: "/m/1.jpg", alt: "Background 1" },
+    { id: 2, src: "/m/2.jpg", alt: "Background 2" },
+    { id: 3, src: "/m/3.jpg", alt: "Background 3" },
+    { id: 4, src: "/m/4.jpg", alt: "Background 4" },
+    { id: 5, src: "/m/5.jpg", alt: "Background 5" },
+    { id: 6, src: "/m/6.jpg", alt: "Background 6" },
+    { id: 7, src: "/m/7.jpg", alt: "Background 7" },
+    { id: 8, src: "/m/8.jpg", alt: "Background 8" },
+  ];
 
   const toggleAccordion = (section: string) => {
     setOpenAccordion(openAccordion === section ? null : section);
@@ -71,7 +82,6 @@ function TentangContent() {
     setCurrentSlide((prev) => (prev === 0 ? serviceImages.length - 1 : prev - 1));
   };
 
-  // Fungsi Auto-Slide tiap 4 detik
   useEffect(() => {
     if (!isHovered) {
       intervalRef.current = setInterval(nextSlide, 4000);
@@ -85,6 +95,14 @@ function TentangContent() {
     };
   }, [isHovered]);
 
+  useEffect(() => {
+    if (backgroundImages.length === 0) return;
+    const interval = setInterval(() => {
+      setHeaderSlide((prev) => (prev + 1) % backgroundImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [backgroundImages.length]);
+
   const projectImages = Array.from({ length: 16 }, (_, i) => ({
     src: `/m/${i + 1}.jpg`,
     alt: `Proyek ${i + 1}`,
@@ -92,22 +110,31 @@ function TentangContent() {
 
   return (
     <>
-      {/* HEADER VIDEO BACKGROUND */}
       <section className="relative py-28 md:py-40 flex items-center justify-center overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        >
-          <source src="/video/firmus.mp4" type="video/mp4" />
-          <div className="absolute inset-0 bg-blue-900/80 z-0" />
-        </video>
+        <div className="absolute inset-0 z-0 w-full h-full">
+          {backgroundImages.map((img, index) => (
+            <div
+              key={img.id}
+              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+                index === headerSlide ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                sizes="100vw"
+                quality={90}
+                priority={index === 0}
+                className="object-cover object-center"
+              />
+            </div>
+          ))}
+        </div>
 
-        <div className="absolute inset-0 bg-black/50 z-1"></div>
+        <div className="absolute inset-0 bg-black/50 z-10"></div>
 
-        <div className="relative z-10 text-center px-4">
+        <div className="relative z-20 text-center px-4">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg tracking-tight">
             {t.title}
           </h1>
@@ -117,7 +144,6 @@ function TentangContent() {
         </div>
       </section>
 
-      {/* TENTANG PERUSAHAAN */}
       <section className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -138,7 +164,6 @@ function TentangContent() {
         </div>
       </section>
 
-      {/* ACCORDION VISI, MISI & MOTTO */}
       <section className="py-6 px-4 bg-gray-50">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-3 border border-gray-100">
@@ -178,7 +203,6 @@ function TentangContent() {
         </div>
       </section>
 
-      {/* LAYANAN KAMI (SLIDER - AUTO SLIDE 4 DETIK) */}
       <section className="py-12 px-4 bg-gray-50">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-6">
@@ -243,7 +267,6 @@ function TentangContent() {
         </div>
       </section>
 
-      {/* GALERI PROYEK (16 FOTO) */}
       <section className="py-12 px-4 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
@@ -276,13 +299,9 @@ function TentangContent() {
 
 export default function TentangPage() {
   return (
-    <LanguageProvider>
-      <main className="min-h-screen bg-white">
-        <Navbar />
-        <TentangContent />
-        <Footer />
-      </main>
-    </LanguageProvider>
+    <main className="min-h-screen bg-white">
+      <TentangContent />
+      <Footer />
+    </main>
   );
 }
-

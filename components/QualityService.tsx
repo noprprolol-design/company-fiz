@@ -62,7 +62,13 @@ export default function QualityService() {
   };
 
   const t = content[lang];
-  const icons = [<FaCheck />, <FaClock />, <FaFileAlt />, <FaHandHoldingHeart />, <FaHeadset />];
+  const icons = [
+    <FaCheck key="check" />,
+    <FaClock key="clock" />,
+    <FaFileAlt key="file" />,
+    <FaHandHoldingHeart key="hand" />,
+    <FaHeadset key="headset" />,
+  ];
 
   return (
     <section className="py-16 px-4 md:py-24 bg-gray-50">

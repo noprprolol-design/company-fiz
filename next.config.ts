@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
     "*.ngrok-free.app",
     "*.ngrok.io",
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "asset.inaproc.id",
+        pathname: "/upload/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

@@ -1,13 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaUser, FaWhatsapp, FaCalendarAlt } from "react-icons/fa";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
-import { useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
+import { useState, useEffect } from "react";
 
 function KontakContent() {
   const { lang } = useLanguage();
+  const [headerSlide, setHeaderSlide] = useState(0);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -27,12 +28,31 @@ function KontakContent() {
     text: '',
   });
 
+  const backgroundImages = [
+    { id: 1, src: "/m/1.jpg", alt: "Background 1" },
+    { id: 2, src: "/m/2.jpg", alt: "Background 2" },
+    { id: 3, src: "/m/3.jpg", alt: "Background 3" },
+    { id: 4, src: "/m/4.jpg", alt: "Background 4" },
+    { id: 5, src: "/m/5.jpg", alt: "Background 5" },
+    { id: 6, src: "/m/6.jpg", alt: "Background 6" },
+    { id: 7, src: "/m/7.jpg", alt: "Background 7" },
+    { id: 8, src: "/m/8.jpg", alt: "Background 8" },
+  ];
+
   const whatsappNumber = "6281316053333";
+
+  // Auto-slide header background
+  useEffect(() => {
+    if (backgroundImages.length === 0) return;
+    const interval = setInterval(() => {
+      setHeaderSlide((prev) => (prev + 1) % backgroundImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [backgroundImages.length]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Hilangkan status message saat user mulai mengetik
     if (statusMessage.type) {
       setStatusMessage({ type: null, text: '' });
     }
@@ -54,8 +74,7 @@ function KontakContent() {
       const result = await response.json();
 
       if (result.success) {
-        setStatusMessage({ type: 'success', text: '✅ Pesan berhasil dikirim! Kami akan segera merespons.' });
-        // Reset form
+        setStatusMessage({ type: 'success', text: 'Pesan berhasil dikirim! Kami akan segera merespons.' });
         setFormData({
           fullName: '',
           email: '',
@@ -70,10 +89,10 @@ function KontakContent() {
           additionalMessage: '',
         });
       } else {
-        setStatusMessage({ type: 'error', text: result.message || '❌ Gagal mengirim pesan. Silakan coba lagi.' });
+        setStatusMessage({ type: 'error', text: result.message || 'Gagal mengirim pesan. Silakan coba lagi.' });
       }
-    } catch (error) {
-      setStatusMessage({ type: 'error', text: '❌ Terjadi kesalahan. Silakan coba lagi.' });
+    } catch {
+      setStatusMessage({ type: 'error', text: 'Terjadi kesalahan. Silakan coba lagi.' });
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +108,7 @@ function KontakContent() {
       address3: "Tanah Abang 10250, Jakarta, Indonesia",
       phone: "+62-21 2274-1521",
       email: "info@firmusindo.co.id",
-      openMaps: "📍 Buka di Google Maps",
+      openMaps: "Buka di Google Maps",
       formTitle: "Konsultasi",
       formSubtitle: "Isi formulir di bawah ini, dan kami akan merespons via email atau WhatsApp",
       fullName: "Full Name",
@@ -156,7 +175,7 @@ function KontakContent() {
       address3: "Tanah Abang 10250, Jakarta, Indonesia",
       phone: "+62-21 2274-1521",
       email: "info@firmusindo.co.id",
-      openMaps: "📍 Open in Google Maps",
+      openMaps: "Open in Google Maps",
       formTitle: "Consultation",
       formSubtitle: "Fill out the form below, and we will respond via email or WhatsApp",
       fullName: "Full Name",
@@ -272,20 +291,32 @@ function KontakContent() {
 
   return (
     <>
-      {/* HEADER VIDEO BACKGROUND */}
+      {/* HEADER BACKGROUND SLIDESHOW */}
       <section className="relative py-28 md:py-40 flex items-center justify-center overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        >
-          <source src="/video/firmus.mp4" type="video/mp4" />
-          <div className="absolute inset-0 bg-blue-900/80 z-0" />
-        </video>
-        <div className="absolute inset-0 bg-black/50 z-1"></div>
-        <div className="relative z-10 text-center px-4">
+        <div className="absolute inset-0 z-0 w-full h-full">
+          {backgroundImages.map((img, index) => (
+            <div
+              key={img.id}
+              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+                index === headerSlide ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                sizes="100vw"
+                quality={90}
+                priority={index === 0}
+                className="object-cover object-center"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="absolute inset-0 bg-black/50 z-10"></div>
+
+        <div className="relative z-20 text-center px-4">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg tracking-tight">
             {t.title}
           </h1>
@@ -312,7 +343,7 @@ function KontakContent() {
                       {t.address3}
                     </p>
                     <a
-                      href="https://www.google.com/maps/place/The+Boulevard+Office/@-6.1894667,106.816046,17z"
+                      href="https://www.google.com/maps/search/?api=1&query=The+Boulevard+Office+Jl.+H.+Fachrudin+No.5+Jakarta"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 text-xs hover:underline mt-1 inline-block"
@@ -350,26 +381,26 @@ function KontakContent() {
             </div>
 
             {/* KOLOM KANAN: Google Maps */}
-            <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg border border-gray-100 h-[350px] relative group">
+            <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg border border-gray-100 h-[350px] relative">
+              <iframe
+                src="https://www.google.com/maps?q=The+Boulevard+Office,+Jl.+H.+Fachrudin+No.5,+Kampung+Bali,+Tanah+Abang,+Jakarta&z=17&output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                title={lang === "id" ? "Peta lokasi kantor PT. Firmusindo Infotama" : "PT. Firmusindo Infotama office location map"}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
               <a
-                href="https://www.google.com/maps/place/The+Boulevard+Office/@-6.1894227,106.8156004,17z"
+                href="https://www.google.com/maps/search/?api=1&query=The+Boulevard+Office+Jl.+H.+Fachrudin+No.5+Jakarta"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full h-full"
+                className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-[10px] font-semibold text-gray-700 shadow-md backdrop-blur-sm transition-colors hover:bg-white hover:text-blue-600"
               >
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.616315731497!2d106.81560038569218!3d-6.189422726955475!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f42d5cb3d5e7%3A0x8eaffb9cd7db05e4!2sThe%20Boulevard!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </a>
-              <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-md text-[10px] font-semibold text-gray-700 border border-gray-200 pointer-events-none group-hover:bg-white transition-colors">
+                <FaMapMarkerAlt className="text-blue-600" />
                 {t.openMaps}
-              </div>
+              </a>
             </div>
           </div>
         </div>
@@ -388,7 +419,6 @@ function KontakContent() {
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-gray-100">
-            {/* STATUS MESSAGE */}
             {statusMessage.type && (
               <div className={`mb-4 p-3 rounded-lg text-sm ${statusMessage.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                 {statusMessage.text}
@@ -624,12 +654,9 @@ function KontakContent() {
 
 export default function KontakPage() {
   return (
-    <LanguageProvider>
-      <main className="min-h-screen bg-white">
-        <Navbar />
-        <KontakContent />
-        <Footer />
-      </main>
-    </LanguageProvider>
+    <main className="min-h-screen bg-white">
+      <KontakContent />
+      <Footer />
+    </main>
   );
 }
